@@ -1,0 +1,59 @@
+خنگ
+parentId داره که همون شماره سوره هست
+categoryid داره که شماره آیه هست
+بعد pageid داره شماره صفحه هست(زمانی کاربر انتخاب می کنم شماره صفحه را)
+juz داره که شماره جزء هست
+favorite داره زمانی کاربر لایک می کنه یک آیه را
+title داره که متن عربی آیه است(متن اصلی)
+comment داره که ترجمه ساده است(ترجمه فارسی باید کوچکتر باشه اگر ترجمه فعال بود)
+مهمترین tafsir داره که تفسیر هست مهم مهم مهم اگر #عدد بود بجای متن مثلا #8 یعنی شماره آیه یعنی categoryid شماره 8 در همین سوره تفسیر را داره مهم مهم مهم
+و Pavaragi داره که همون آیه قرآن بدون اعراب هست زمان جستجو این فیلد خیلی بدرد می خوره
+
+
+مهم مهم مهم ما صفحه بندی مون برای نرم افزار بر اساس آیات مرتبط ساخته میشه مهمترین سوال از کجا بفهمیم آیات مرتبط هستند؟؟؟ تو اول شماره صفحه را سکلت کن(سکلت 1) بعد آیات هم تفسیر را در یک دسته بیار مهمترین بخش همینه. از کجا بفهمیم آیات هم تفسیر هستند؟ اگر روبروی آیه تفسیر داشت که همین آیه سرگروه است . اگر آیه بعدی هم تفسیر داشت که دو آیه مجزا هستند ولی اگر آیات بعدی تا n عدد بجای تفسیر # + عدد همین آیه را داشتند یعنی هم گروه این آیه هستند و باید متن عربی این آیات منفصل بیایید سپس معنی بیایید.
+
+با نهایت دقت بخون بببین کامل فهمیدی چی گفتم ؟؟؟؟ این مهمترین اطلاعات بود.... اگر فهمیدی بگو
+
+app/src/main/res/font/noorzar.ttf
+app/src/main/res/font/noorlotus.ttf
+app/src/main/res/font/amiri.ttf
+app/src/main/res/font/scheherazade.ttf
+app/src/main/res/font/taha.ttf
+
+app/src/main/assets/databases/TafsirNemooneh61.db
+
+ طراحی تمام صفحات  با Jetpack androidx
+dependencies {
+    implementation("androidx.compose.ui:ui:1.5.0")
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.0")
+    implementation("androidx.activity:activity-compose:1.7.2")
+    // برای نویگیشن (بعداً)
+    // implementation("androidx.navigation:navigation-compose:2.7.0")
+}
+
+
+مشکل اصلی اینه parentid را نمی بینه
+شاید من بد تایپ کردم
+اطلاعات فیلدهای جدول اینه دقیقشون کن
+ جدول: Quran
+    ستون‌ها: MetaDataID (INTEGER), Title (nvarchar), Comment (nvarchar), Tafsir (nvarchar), ParentID (INTEGER), PageID (INTEGER), CategoryID (INTEGER), Pavaragi (nvarchar), favorite (INTEGER), Juz (INTEGER)
+
+دقیقتا همین شکیلی
+parentId → ParentID (capital P, D)
+
+categoryid → CategoryID (capital C, D)
+
+pageid → PageID (capital P, D)
+
+juz → Juz (capital J) — maybe case-sensitive, but we'll match exactly.
+
+title → Title (capital T)
+
+comment → Comment (capital C)
+
+tafsir → Tafsir (capital T)
+
+Pavaragi → Pavaragi (capital P)
+
+favorite → favorite (lowercase f, matches)

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* فونت‌های پروژه */
+        @font-face {
+            font-family: 'NoorZar';
+            src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/noorzar.ttf');
+        }
+        @font-face {
+            font-family: 'NoorLotus';
+            src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/noorlotus.ttf');
+        }
+        @font-face {
+            font-family: 'Scheherazade';
+            src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/scheherazade.ttf');
+        }
+        @font-face {
+            font-family: 'Amiri';
+            src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/amiri.ttf');
+        }
+        @font-face {
+            font-family: 'Taha';
+            src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/taha.ttf');
+        }
+        @font-face {
+            font-family: 'FontAwesome';
+            src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/fontawesome.ttf');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4f8, #d9e2ec, #e6e6fa, #f5f0e6);
+            background-size: 300% 300%;
+            animation: pearlShift 20s ease infinite;
+            color: #2c3e50;
+            text-align: center;
+            padding: 16px;
+            font-family: 'NoorZar', serif;
+        }
+
+        @keyframes pearlShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ayah {
+            padding: 16px 14px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            line-height: 2.2;
+            transition: all 0.35s ease;
+            position: relative;
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .ayah.active {
+            font-weight: bold;
+            color: #1e3799;                          /* آبی نیلی */
+            background: rgba(255,255,255,0.9);
+            text-shadow:
+                0 0 14px rgba(30,55,153,0.6),       /* درخشش آبی */
+                0 0 4px rgba(0,0,0,0.15);
+            box-shadow: 0 0 0 1px rgba(30,55,153,0.35),
+                        0 6px 20px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+
+        .ayah-num {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 6px;
+            font-family: 'NoorLotus', sans-serif;
+        }
+
+        .translation {
+            margin-top: 8px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 8px;
+            padding: 8px 12px;
+            line-height: 1.8;
+            font-family: 'NoorLotus', sans-serif;
+            text-align: center;
+            color: #34495e;
+        }
+
+        /* قلب با فونت‌اوسام */
+        .favorite-heart {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            font-family: 'FontAwesome';
+            font-size: 20px;
+            cursor: pointer;
+            color: #b0bec5;
+            user-select: none;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .favorite-heart.liked {
+            color: #e74c3c;
+        }
+
+        .favorite-heart:hover {
+            transform: scale(1.2);
+        }
+
+        .favorite-heart::before {
+            content: '\f004';
+        }
+
+        .tafsir-toggle {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 24px;
+            background: #2980b9;
+            color: white;
+            font-size: 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'NoorLotus', sans-serif;
+            transition: background 0.3s;
+        }
+
+        .tafsir-toggle:hover {
+            background: #1f618d;
+        }
+
+        .tafsir-content {
+            display: none;
+            background: rgba(255,255,255,0.85);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #2c3e50;
+            text-align: justify;
+            line-height: 1.8;
+            font-family: 'NoorLotus', sans-serif;
+        }
+
+        .group-separator {
+            height: 0;
+            border-bottom: 2px dashed rgba(0,0,0,0.1);
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="quran-container"></div>
+<script>
+    function renderQuran(groups, showTranslation, fontFamily, translationFont, tafsirFont,
+                          fontSize, transSize, tafsirSize) {
+        var c = document.getElementById('quran-container');
+        if (!c) return;
+        c.innerHTML = '';
+        groups.forEach(function(g, groupIndex) {
+            var d = document.createElement('div');
+            g.verses.forEach(function(v) {
+                var a = document.createElement('div');
+                a.className = 'ayah';
+                a.id = 'ayah-' + v.surahId + '-' + v.categoryId;
+                a.innerText = v.title;
+                a.style.fontFamily = fontFamily;
+                a.style.fontSize = fontSize + 'px';
+                a.ondblclick = function() { Android.playFromAyah(v.surahId, v.categoryId); };
+
+                if (showTranslation && v.translation) {
+                    var trans = document.createElement('div');
+                    trans.className = 'translation';
+                    trans.innerText = v.translation;
+                    trans.style.fontFamily = translationFont;
+                    trans.style.fontSize = transSize + 'px';
+                    a.appendChild(trans);
+                }
+
+                var num = document.createElement('div');
+                num.className = 'ayah-num';
+                num.innerHTML = '﴿' + v.ayahNumber + ' از ' + v.ayahCount + ' ' + v.surahName + ' - صفحه ' + v.pageId + '﴾';
+                num.style.fontFamily = translationFont;
+                num.style.fontSize = (transSize - 2) + 'px';
+                a.appendChild(num);
+
+                var heart = document.createElement('span');
+                heart.className = 'favorite-heart' + (v.favorite ? ' liked' : '');
+                heart.id = 'heart-' + v.surahId + '-' + v.categoryId;
+                heart.onclick = function() { Android.toggleFavorite(v.surahId, v.categoryId); };
+                a.appendChild(heart);
+
+                d.appendChild(a);
+            });
+
+            if (g.tafsir) {
+                var s = document.createElement('span');
+                s.className = 'tafsir-toggle';
+                s.innerText = 'تفسیر';
+                s.onclick = function() {
+                    var cnt = this.nextElementSibling;
+                    if (cnt.style.display === 'none' || cnt.style.display === '') {
+                        cnt.style.display = 'block';
+                        Android.showTafsir(g.tafsir);
+                    } else cnt.style.display = 'none';
+                };
+                d.appendChild(s);
+                var cnt = document.createElement('div');
+                cnt.className = 'tafsir-content';
+                cnt.innerText = g.tafsir;
+                cnt.style.fontFamily = tafsirFont;
+                cnt.style.fontSize = tafsirSize + 'px';
+                d.appendChild(cnt);
+            }
+
+            if (groupIndex < groups.length - 1) {
+                for (var i = 0; i < 3; i++) {
+                    var sep = document.createElement('div');
+                    sep.className = 'group-separator';
+                    d.appendChild(sep);
+                }
+            }
+            c.appendChild(d);
+        });
+    }
+
+    function highlightAyah(surahId, categoryId) {
+        var all = document.querySelectorAll('.ayah');
+        all.forEach(function(el) { el.classList.remove('active'); });
+        var target = document.getElementById('ayah-' + surahId + '-' + categoryId);
+        if (target) {
+            target.classList.add('active');
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function setHeartState(surahId, categoryId, isFavorite) {
+        var heart = document.getElementById('heart-' + surahId + '-' + categoryId);
+        if (heart) {
+            if (isFavorite) {
+                heart.classList.add('liked');
+            } else {
+                heart.classList.remove('liked');
+            }
+        }
+    }
+</script>
+</body>
+</html>
