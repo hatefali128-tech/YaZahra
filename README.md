@@ -37,14 +37,24 @@
 
 ## 📞 ارتباط
 
-- **ایمیل:** hatefali128@gmail.com
+- **ایمیل:** hosein7hosein@gmail.com
 - **وب‌سایت:** quran.1fe.ir
+- **گیت‌هاب:** [@hatefali128-tech](https://github.com/hatefali128-tech)
 
 ---
 
-## 🙏 تشکر
+## 🙏 تشکر و قدردانی
 
-از پروژه‌های **ذکر، مکارم، Quran.com و بنیاد ملک فهد** تشکر می‌کنیم.
+از پروژه‌ها و مؤسسات زیر که در تهیه محتوای این برنامه نقش داشتند، صمیمانه تشکر می‌کنیم:
+
+- **ذکر (Zekr)** - [zekr.app](https://zekr.app)
+- **قرآن دات کام (Quran.com)** - [quran.com](https://quran.com)
+- **تفسیر نت (Tafsir.net)** - [tafsir.net](https://tafsir.net)
+- **مکارم (Makarim)** - [makarem.ir](https://makarem.ir)
+- **مجمع ملک فهد (Quran Complex)** - [qurancomplex.gov.sa](https://qurancomplex.gov.sa)
+- **شهرزاد (Shahrezad)** - [shahrezad.app](https://shahrezad.app)
+- **فونت امیری (Amiri Font)** - [amiri-font.org](https://amiri-font.org)
+- **نرم‌افزار نور (Noorsoft)** - [noorsoft.org](https://noorsoft.org)
 
 ---
 
