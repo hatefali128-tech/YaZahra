@@ -122,19 +122,19 @@ fun QuranPageScreen(
 
     var playbackSpeed by remember { mutableFloatStateOf(prefs.getFloat("playback_speed", 1.0f)) }
 
-    var quranFontFamily by remember { mutableStateOf(prefs.getString("quran_font", "NoorZar") ?: "NoorZar") }
+    var quranFontFamily by remember { mutableStateOf(prefs.getString("quran_font", "Taha") ?: "Taha") }
     var translationFontFamily by remember { mutableStateOf(prefs.getString("translation_font", "NoorLotus") ?: "NoorLotus") }
     var tafsirFontFamily by remember { mutableStateOf(prefs.getString("tafsir_font", "NoorLotus") ?: "NoorLotus") }
-    var quranFontSize by remember { mutableIntStateOf(prefs.getInt("quran_font_size", 24)) }
+    var quranFontSize by remember { mutableIntStateOf(prefs.getInt("quran_font_size", 26)) }
     var translationFontSize by remember { mutableIntStateOf(prefs.getInt("translation_font_size", 16)) }
     var tafsirFontSize by remember { mutableIntStateOf(prefs.getInt("tafsir_font_size", 16)) }
 
     var themeFiles by remember { mutableStateOf<List<String>>(emptyList()) }
-    var selectedThemeIndex by remember { mutableIntStateOf(prefs.getInt("selected_theme_index", 0)) }
+    var selectedThemeIndex by remember { mutableIntStateOf(prefs.getInt("selected_theme_index", 8)) }
 
     var currentAyahIndex by remember { mutableIntStateOf(0) }
 
-    // متغیر برای نگهداری Job پیش‌دانلود تا در صورت شروع جدید لغو شود
+    // نگهداری Job پیش‌دانلود برای لغو در صورت شروع جدید
     var prefetchJob by remember { mutableStateOf<Job?>(null) }
 
     // کپی فونت‌ها
@@ -200,6 +200,7 @@ fun QuranPageScreen(
         isLoading = false
     }
 
+    // گروه‌بندی آیات با الگوریتم اصلاح‌شده (از قبل در QuranModels)
     val groups = remember(verses) { if (verses.isNotEmpty()) groupVerses(verses) else emptyList() }
     val surahName = allSurahs.find { it.number == verses.firstOrNull()?.parentId }?.persianName ?: ""
     val juz = verses.firstOrNull()?.juz ?: 0
@@ -233,12 +234,14 @@ fun QuranPageScreen(
         }
     }
 
+    // ✅ اصلاح اصلی: در ساخت JSON تفسیر را تریم می‌کنیم
     val groupsJson = remember(groups, translationVisible, currentPage) {
         try {
             JSONArray().apply {
                 groups.forEach { g ->
                     put(JSONObject().apply {
-                        put("tafsir", if (!g.headVerse.tafsir.startsWith("#")) g.headVerse.tafsir else "")
+                        val headTafsir = g.headVerse.tafsir.trim()
+                        put("tafsir", if (headTafsir.isNotEmpty() && !headTafsir.startsWith("#")) headTafsir else "")
                         put("verses", JSONArray().apply {
                             g.memberVerses.forEach { v ->
                                 val surah = allSurahs.find { it.number == v.parentId }
@@ -246,7 +249,7 @@ fun QuranPageScreen(
                                     put("surahId", v.parentId)
                                     put("categoryId", v.categoryId)
                                     put("title", v.title)
-                                    put("translation", if (translationVisible) v.comment else "")
+                                    put("translation", if (translationVisible) v.comment.trim() else "")
                                     put("ayahNumber", v.categoryId)
                                     put("ayahCount", surah?.ayahCount ?: 0)
                                     put("surahName", surah?.persianName ?: "")
@@ -271,7 +274,7 @@ fun QuranPageScreen(
         )
     }
 
-    // تابع پخش آیه
+    // پخش آیه
     fun playAyah(index: Int, includeBismillah: Boolean = true) {
         if (index < 0 || index >= allVerses.size) return
         coroutineScope.launch {
@@ -296,10 +299,7 @@ fun QuranPageScreen(
                             onNoInternet = { showError("اتصال اینترنت برقرار نیست. برای پخش آنلاین به اینترنت نیاز دارید.") }
                         )
                     }
-                    if (!downloaded) {
-                        showError("دانلود صوت بسم‌الله ناموفق بود")
-                        return@launch
-                    }
+                    if (!downloaded) { showError("دانلود صوت بسم‌الله ناموفق بود"); return@launch }
                     val folder = File(context.filesDir, "audio/$qari/001")
                     val file = File(folder, "001001.mp3")
                     val mp = MediaPlayer().apply {
@@ -309,15 +309,12 @@ fun QuranPageScreen(
                         params.speed = playbackSpeed
                         playbackParams = params
                         setOnCompletionListener {
-                            isPlaying = false
-                            release()
-                            mediaPlayer = null
+                            isPlaying = false; release(); mediaPlayer = null
                             playAyah(index, includeBismillah = false)
                         }
                         start()
                     }
-                    mediaPlayer = mp
-                    isPlaying = true
+                    mediaPlayer = mp; isPlaying = true
                     return@launch
                 }
 
@@ -331,19 +328,15 @@ fun QuranPageScreen(
                         onNoInternet = { showError("اتصال اینترنت برقرار نیست. برای پخش آنلاین به اینترنت نیاز دارید.") }
                     )
                 }
-                if (!downloaded) {
-                    showError("دانلود صوت ناموفق بود")
-                    return@launch
-                }
+                if (!downloaded) { showError("دانلود صوت ناموفق بود"); return@launch }
 
-                // لغو پیش‌دانلود قبلی و شروع جدید برای ۳ آیه بعد
+                // پیش‌دانلود ۳ آیه بعد
                 prefetchJob?.cancel()
                 prefetchJob = coroutineScope.launch(Dispatchers.IO) {
                     for (i in 1..3) {
                         val nextIndex = index + i
                         if (nextIndex < allVerses.size) {
                             val next = allVerses[nextIndex]
-                            // فقط اگر فایل وجود ندارد دانلود کن
                             val file = File(context.filesDir, "audio/$qari/${next.parentId.toString().padStart(3, '0')}/${next.parentId.toString().padStart(3, '0')}${next.categoryId.toString().padStart(3, '0')}.mp3")
                             if (!file.exists() || file.length() == 0L) {
                                 downloadAyahWithRetry(context, qari, next.parentId, next.categoryId)
@@ -363,9 +356,7 @@ fun QuranPageScreen(
                     params.speed = playbackSpeed
                     playbackParams = params
                     setOnCompletionListener {
-                        isPlaying = false
-                        release()
-                        mediaPlayer = null
+                        isPlaying = false; release(); mediaPlayer = null
                         if (repeatRemaining > 0) {
                             repeatRemaining--
                             playAyah(index, includeBismillah = true)
@@ -384,12 +375,9 @@ fun QuranPageScreen(
                     }
                     start()
                 }
-                mediaPlayer = mp
-                isPlaying = true
+                mediaPlayer = mp; isPlaying = true
                 webView?.evaluateJavascript("highlightAyah(${ayah.parentId}, ${ayah.categoryId})", null)
-            } catch (e: Exception) {
-                showError("پخش خطا: ${e.message}")
-            }
+            } catch (e: Exception) { showError("پخش خطا: ${e.message}") }
         }
     }
 
@@ -401,7 +389,7 @@ fun QuranPageScreen(
         }
     }
 
-    // پخش خودکار بعد از بارگذاری صفحه یا تغییر صفحه
+    // پخش خودکار بعد از بارگذاری صفحه
     LaunchedEffect(verses) {
         if (verses.isNotEmpty()) {
             if (surahId != 0 && ayahNumber != 0) {
@@ -447,10 +435,7 @@ fun QuranPageScreen(
 
     fun exitScreen() {
         if (isPlaying) {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            isPlaying = false
+            mediaPlayer?.stop(); mediaPlayer?.release(); mediaPlayer = null; isPlaying = false
         }
         addHistoryEntry()
         onBack()

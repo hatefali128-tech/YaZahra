@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @font-face { font-family: 'NoorZar';      src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/noorzar.ttf'); }
+        @font-face { font-family: 'NoorLotus';    src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/noorlotus.ttf'); }
+        @font-face { font-family: 'Scheherazade'; src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/scheherazade.ttf'); }
+        @font-face { font-family: 'Amiri';        src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/amiri.ttf'); }
+        @font-face { font-family: 'Taha';         src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/taha.ttf'); }
+        @font-face { font-family: 'FontAwesome';  src: url('file:///data/data/ir.fena.quran.arshad.yazahra/files/fonts/fontawesome.ttf'); }
+
+        :root {
+            --bg-deep:    #050f0c;
+            --bg-mid:     #0b241d;
+            --bg-soft:    #102e25;
+            --emerald:    #50c878;                  /* سبز زمردی */
+            --emerald-bright: #7fffd4;              /* سبز زمردی روشن */
+            --emerald-dim: #2e6b4f;                 /* سبز زمردی کم‌رنگ */
+            --ivory:      #f3e9d2;
+            --sage:       #8fb8a6;
+            --sage-dim:   #4d6f5f;
+            --rose:       #d4667a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { background-color: var(--bg-deep); }
+
+        body {
+            background:
+                radial-gradient(ellipse 120% 60% at 50% -10%, rgba(80,200,120,0.10), transparent 60%),
+                radial-gradient(ellipse 100% 80% at 50% 110%, rgba(16,46,37,0.9), transparent 60%),
+                linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 100%);
+            color: var(--ivory);
+            text-align: center;
+            padding: 20px 16px;
+            font-family: 'NoorZar', serif;
+            min-height: 100vh;
+        }
+
+        .group { display: block; margin-bottom: 26px; }
+
+        .ayah {
+            position: relative;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            line-height: 2.3;
+            color: var(--emerald);              /* متن عربی سبز زمردی */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            border: 1px solid rgba(80,200,120,0.14);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.005));
+            transition: border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+        }
+
+        .ayah.active {
+            font-weight: bold;
+            color: var(--emerald-bright);       /* متن فعال سبز زمردی روشن */
+            background: linear-gradient(180deg, rgba(80,200,120,0.10), rgba(80,200,120,0.03));
+            border: 1px solid rgba(127,255,212,0.55);
+            box-shadow:
+                0 0 0 1px rgba(127,255,212,0.12),
+                0 0 24px rgba(80,200,120,0.30),
+                inset 0 0 18px rgba(80,200,120,0.08);
+            text-shadow: 0 0 12px rgba(127,255,212,0.45), 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        /* گوشه‌های تزئینی سبز زمردی */
+        .ayah.active::before,
+        .ayah.active::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            pointer-events: none;
+        }
+        .ayah.active::before {
+            top: 6px; right: 6px;
+            border-top: 2px solid var(--emerald-bright);
+            border-right: 2px solid var(--emerald-bright);
+            border-radius: 0 6px 0 0;
+        }
+        .ayah.active::after {
+            bottom: 6px; left: 6px;
+            border-bottom: 2px solid var(--emerald-bright);
+            border-left: 2px solid var(--emerald-bright);
+            border-radius: 0 0 0 6px;
+        }
+
+        .ayah-num {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 3px 12px;
+            font-size: 11px;
+            color: var(--sage);
+            border: 1px solid rgba(143,184,166,0.25);
+            border-radius: 20px;
+            font-family: 'NoorLotus', sans-serif;
+            background: rgba(0,0,0,0.15);
+        }
+
+        .translation {
+            margin-top: 10px;
+            padding: 10px 4px 4px;
+            border-top: 1px dashed rgba(143,184,166,0.18);
+            line-height: 1.9;
+            font-family: 'NoorLotus', sans-serif;
+            color: var(--sage);
+            text-align: center;
+            text-shadow: none;
+        }
+
+        .favorite-heart {
+            display: inline-block;
+            margin-top: 10px;
+            font-family: 'FontAwesome';
+            font-size: 17px;
+            cursor: pointer;
+            color: var(--sage-dim);
+            user-select: none;
+            transition: color 0.3s ease, transform 0.25s ease, text-shadow 0.3s ease;
+        }
+        .favorite-heart.liked {
+            color: var(--rose);
+            text-shadow: 0 0 10px rgba(212,102,122,0.7);
+        }
+        .favorite-heart:hover { transform: scale(1.2); }
+        .favorite-heart::before { content: '\f004'; }
+
+        .tafsir-toggle {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 22px;
+            background: transparent;
+            color: var(--emerald);
+            border: 1px solid var(--emerald-dim);
+            border-radius: 30px;
+            outline: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'NoorLotus', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            transition: all 0.3s ease;
+        }
+        .tafsir-toggle:hover {
+            color: var(--bg-deep);
+            background: linear-gradient(180deg, var(--emerald-bright), var(--emerald));
+            border-color: var(--emerald-bright);
+            box-shadow: 0 0 14px rgba(80,200,120,0.4);
+        }
+
+        .tafsir-content {
+            display: none;
+            margin-top: 10px;
+            padding: 12px 14px;
+            border-right: 2px solid var(--emerald-dim);
+            background: rgba(0,0,0,0.18);
+            border-radius: 4px 10px 10px 4px;
+            font-size: 14px;
+            color: #cfe0d6;
+            text-align: justify;
+            line-height: 1.85;
+            font-family: 'NoorLotus', sans-serif;
+            text-shadow: none;
+        }
+
+        /* جداکننده با نماد ❖ و رنگ سبز */
+        .group-separator {
+            position: relative;
+            height: 1px;
+            margin: 24px 0;
+            background: linear-gradient(90deg, transparent, var(--emerald-dim), transparent);
+        }
+        .group-separator::after {
+            content: '❖';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-deep);
+            color: var(--emerald);
+            font-size: 12px;
+            padding: 0 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="quran-container"></div>
+<script>
+    function renderQuran(groups, showTranslation, fontFamily, translationFont, tafsirFont,
+                          fontSize, transSize, tafsirSize) {
+        var c = document.getElementById('quran-container');
+        if (!c) return;
+        c.innerHTML = '';
+        groups.forEach(function(g, groupIndex) {
+            var groupDiv = document.createElement('div');
+            groupDiv.className = 'group';
+
+            g.verses.forEach(function(v) {
+                var a = document.createElement('div');
+                a.className = 'ayah';
+                a.id = 'ayah-' + v.surahId + '-' + v.categoryId;
+                a.innerText = v.title;
+                a.style.fontFamily = fontFamily;
+                a.style.fontSize = fontSize + 'px';
+                a.ondblclick = function() { Android.playFromAyah(v.surahId, v.categoryId); };
+
+                if (showTranslation && v.translation) {
+                    var trans = document.createElement('div');
+                    trans.className = 'translation';
+                    trans.innerText = v.translation;
+                    trans.style.fontFamily = translationFont;
+                    trans.style.fontSize = transSize + 'px';
+                    a.appendChild(trans);
+                }
+
+                var num = document.createElement('div');
+                num.className = 'ayah-num';
+                num.innerHTML = '﴿' + v.ayahNumber + ' از ' + v.ayahCount + ' ' + v.surahName + ' - صفحه ' + v.pageId + '﴾';
+                num.style.fontFamily = translationFont;
+                num.style.fontSize = (transSize - 2) + 'px';
+                a.appendChild(num);
+
+                var heart = document.createElement('span');
+                heart.className = 'favorite-heart' + (v.favorite ? ' liked' : '');
+                heart.id = 'heart-' + v.surahId + '-' + v.categoryId;
+                heart.onclick = function() { Android.toggleFavorite(v.surahId, v.categoryId); };
+                a.appendChild(heart);
+
+                groupDiv.appendChild(a);
+            });
+
+            if (g.tafsir) {
+                var toggle = document.createElement('span');
+                toggle.className = 'tafsir-toggle';
+                toggle.innerText = 'تفسیر';
+                toggle.onclick = function() {
+                    var content = this.nextElementSibling;
+                    if (content.style.display === 'none' || content.style.display === '') {
+                        content.style.display = 'block';
+                        Android.showTafsir(g.tafsir);
+                    } else {
+                        content.style.display = 'none';
+                    }
+                };
+                groupDiv.appendChild(toggle);
+                var tafsirDiv = document.createElement('div');
+                tafsirDiv.className = 'tafsir-content';
+                tafsirDiv.innerText = g.tafsir;
+                tafsirDiv.style.fontFamily = tafsirFont;
+                tafsirDiv.style.fontSize = tafsirSize + 'px';
+                groupDiv.appendChild(tafsirDiv);
+            }
+
+            if (groupIndex < groups.length - 1) {
+                var sep = document.createElement('div');
+                sep.className = 'group-separator';
+                groupDiv.appendChild(sep);
+            }
+
+            c.appendChild(groupDiv);
+        });
+    }
+
+    function highlightAyah(surahId, categoryId) {
+        var all = document.querySelectorAll('.ayah');
+        all.forEach(function(el) { el.classList.remove('active'); });
+        var target = document.getElementById('ayah-' + surahId + '-' + categoryId);
+        if (target) {
+            target.classList.add('active');
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function setHeartState(surahId, categoryId, isFavorite) {
+        var heart = document.getElementById('heart-' + surahId + '-' + categoryId);
+        if (heart) {
+            if (isFavorite) {
+                heart.classList.add('liked');
+            } else {
+                heart.classList.remove('liked');
+            }
+        }
+    }
+</script>
+</body>
+</html>
